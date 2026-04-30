@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MathGenius — Solve anything</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #080b14;
+      --surface: #0e1320;
+      --card: #131826;
+      --border: rgba(255,255,255,0.06);
+      --accent: #4f8eff;
+      --accent2: #a78bfa;
+      --accent3: #34d399;
+      --text: #e8eaf0;
+      --muted: #6b7280;
+      --glow: rgba(79,142,255,0.25);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* ─── GRID BACKGROUND ─── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(79,142,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(79,142,255,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─── NOISE OVERLAY ─── */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 48px;
+      background: rgba(8,11,20,0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 800;
+      font-size: 1.4rem;
+      letter-spacing: -0.02em;
+      display: flex; align-items: center; gap: 10px;
+    }
+
+    .logo-icon {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+    }
+ 
+    .logo span { color: var(--accent); }
+ 
+    nav ul { list-style: none; display: flex; gap: 32px; }
+    nav ul a {
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color .2s;
+    }
+    nav ul a:hover { color: var(--text); }
+ 
+    .nav-cta {
+      background: var(--accent);
+      color: #fff !important;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: background .2s, transform .2s !important;
+    }
+    .nav-cta:hover { background: #3a7aef !important; transform: translateY(-1px); }
+ 
+    /* ─── HERO ─── */
+    .hero {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+    }
+ 
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(79,142,255,0.1);
+      border: 1px solid rgba(79,142,255,0.3);
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-size: 0.8rem;
+      color: var(--accent);
+      font-weight: 500;
+      margin-bottom: 32px;
+      animation: fadeSlideDown 0.6s ease both;
+    }
+ 
+    .badge-dot {
+      width: 6px; height: 6px;
+      background: var(--accent3);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+ 
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.3); }
+    }
+ 
+    h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: clamp(3rem, 8vw, 6.5rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      margin-bottom: 24px;
+      animation: fadeSlideDown 0.6s 0.1s ease both;
+    }
+ 
+    h1 .line2 {
+      background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+ 
+    .hero-sub {
+      max-width: 560px;
+      font-size: 1.15rem;
+      line-height: 1.7;
+      color: var(--muted);
+      margin-bottom: 48px;
+      animation: fadeSlideDown 0.6s 0.2s ease both;
+    }
+ 
+    .hero-sub strong { color: var(--text); }
+ 
+    .hero-actions {
+      display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;
+      animation: fadeSlideDown 0.6s 0.3s ease both;
+    }
+ 
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--accent);
+      color: #fff;
+      padding: 16px 32px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1rem;
+      text-decoration: none;
+      transition: transform .2s, box-shadow .2s;
+      box-shadow: 0 0 40px var(--glow);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 48px var(--glow);
+    }
+ 
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: transparent;
+      color: var(--text);
+      padding: 16px 32px;
+      border-radius: 12px;
+      font-weight: 500;
+      font-size: 1rem;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      transition: border-color .2s, background .2s;
+    }
+    .btn-secondary:hover {
+      border-color: rgba(255,255,255,0.15);
+      background: var(--card);
+    }
+ 
+    /* ─── FLOATING FORMULA PREVIEW ─── */
+    .hero-preview {
+      position: relative;
+      margin-top: 72px;
+      animation: fadeSlideDown 0.8s 0.4s ease both;
+      width: 100%; max-width: 700px;
+    }
+ 
+    .preview-window {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 40px 120px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03);
+    }
+ 
+    .preview-topbar {
+      background: var(--surface);
+      padding: 14px 20px;
+      display: flex; align-items: center; gap: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+ 
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-r { background: #ff5f57; }
+    .dot-y { background: #febc2e; }
+    .dot-g { background: #28c840; }
+ 
+    .preview-body { padding: 24px; }
+ 
+    .chat-msg {
+      display: flex; gap: 12px; margin-bottom: 20px;
+      opacity: 0;
+      animation: fadeSlideUp 0.5s ease forwards;
+    }
+    .chat-msg:nth-child(1) { animation-delay: 1s; }
+    .chat-msg:nth-child(2) { animation-delay: 1.6s; }
+    .chat-msg:nth-child(3) { animation-delay: 2.2s; }
+ 
+    .chat-msg.user { flex-direction: row-reverse; }
+ 
+    .avatar {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; font-weight: 700;
+      flex-shrink: 0;
+    }
+ 
+    .avatar-bot {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+    }
+ 
+    .avatar-user {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+ 
+    .bubble {
+      padding: 12px 16px;
+      border-radius: 12px;
+      max-width: 80%;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+ 
+    .bubble-bot {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top-left-radius: 4px;
+    }
+ 
+    .bubble-user {
+      background: var(--accent);
+      color: #fff;
+      border-top-right-radius: 4px;
+    }
+ 
+    .step {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 6px 0;
+    }
+ 
+    .step-num {
+      background: rgba(79,142,255,0.2);
+      color: var(--accent);
+      border-radius: 4px;
+      padding: 2px 7px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+ 
+    .highlight { color: var(--accent3); font-weight: 600; }
+ 
+    /* ─── FEATURES ─── */
+    .features {
+      position: relative; z-index: 1;
+      padding: 100px 48px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+ 
+    .section-label {
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+ 
+    .section-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      text-align: center;
+      letter-spacing: -0.03em;
+      margin-bottom: 64px;
+    }
+ 
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+ 
+    .feature-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      transition: transform .3s, border-color .3s, box-shadow .3s;
+      position: relative;
+      overflow: hidden;
+    }
+ 
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--card-accent, var(--accent)), transparent);
+      opacity: 0;
+      transition: opacity .3s;
+    }
+ 
+    .feature-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255,255,255,0.1);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+ 
+    .feature-card:hover::before { opacity: 1; }
+ 
+    .feature-icon {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+    }
+ 
+    .feature-card h3 {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+    }
+ 
+    .feature-card p {
+      font-size: 0.9rem;
+      line-height: 1.65;
+      color: var(--muted);
+    }
+ 
+    /* ─── EXAMPLES TICKER ─── */
+    .ticker-section {
+      position: relative; z-index: 1;
+      padding: 40px 0;
+      overflow: hidden;
+    }
+ 
+    .ticker-track {
+      display: flex; gap: 16px;
+      animation: ticker 20s linear infinite;
+      width: max-content;
+    }
+ 
+    .ticker-track:hover { animation-play-state: paused; }
+ 
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+ 
+    .ticker-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      color: var(--muted);
+      font-family: 'DM Sans', monospace;
+    }
+ 
+    .ticker-item span { color: var(--accent3); }
+ 
+    /* ─── CTA SECTION ─── */
+    .cta-section {
+      position: relative; z-index: 1;
+      padding: 100px 48px;
+      text-align: center;
+    }
+ 
+    .cta-card {
+      max-width: 700px;
+      margin: 0 auto;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 64px 48px;
+      position: relative;
+      overflow: hidden;
+    }
+ 
+    .cta-card::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      background: linear-gradient(135deg, rgba(79,142,255,0.2), transparent 50%, rgba(167,139,250,0.2));
+      border-radius: 24px;
+      z-index: -1;
+    }
+ 
+    .cta-card h2 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+    }
+ 
+    .cta-card p {
+      color: var(--muted);
+      font-size: 1rem;
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+ 
+    /* ─── FOOTER ─── */
+    footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 32px 48px;
+      display: flex; align-items: center; justify-content: space-between;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+ 
+    /* ─── GLOW ORBS ─── */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .orb-1 {
+      width: 600px; height: 600px;
+      background: rgba(79,142,255,0.08);
+      top: -200px; left: -200px;
+      animation: orbFloat 8s ease-in-out infinite;
+    }
+    .orb-2 {
+      width: 500px; height: 500px;
+      background: rgba(167,139,250,0.06);
+      bottom: -100px; right: -100px;
+      animation: orbFloat 10s ease-in-out infinite reverse;
+    }
+ 
+    @keyframes orbFloat {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(30px, -30px); }
+    }
+ 
+    @keyframes fadeSlideDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+ 
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+ 
+    /* ─── LANG SWITCHER ─── */
+    .lang-switcher {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+    .lang-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 5px 9px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 600;
+      font-family: 'DM Sans', sans-serif;
+      transition: color .2s, border-color .2s, background .2s;
+    }
+    .lang-btn:hover, .lang-btn.active {
+      color: var(--accent);
+      border-color: rgba(79,142,255,0.4);
+      background: rgba(79,142,255,0.08);
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 16px 20px; }
+      nav ul { display: none; }
+      .lang-switcher { gap: 2px; }
+      .lang-btn { padding: 4px 6px; font-size: 0.7rem; }
+      .features { padding: 60px 20px; }
+      .cta-section { padding: 60px 20px; }
+      .cta-card { padding: 40px 24px; }
+      footer { flex-direction: column; gap: 12px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+ 
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+ 
+  <!-- NAV -->
+  <nav>
+    <div class="logo">
+      <div class="logo-icon">∑</div>
+      Math<span>Genius</span>
+    </div>
+    <ul>
+      <li><a href="#features" data-i18n="nav_features">Features</a></li>
+      <li><a href="#examples" data-i18n="nav_examples">Examples</a></li>
+      <li><a href="index.html" class="nav-cta" data-i18n="nav_cta">Try it →</a></li>
+    </ul>
+    <div class="lang-switcher">
+      <button class="lang-btn" data-lang="en">EN</button>
+      <button class="lang-btn" data-lang="fr">FR</button>
+      <button class="lang-btn" data-lang="hi">हि</button>
+      <button class="lang-btn" data-lang="te">తె</button>
+    </div>
+  </nav>
+ 
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">
+      <div class="badge-dot"></div>
+      <span data-i18n="badge">Powered by Gemini AI · Step-by-step explanations</span>
+    </div>
+
+    <h1>
+      <span data-i18n="hero_line1">Solve</span><br/>
+      <span class="line2" data-i18n="hero_line2">anything</span>
+    </h1>
+
+    <p class="hero-sub" data-i18n-html="hero_sub">
+      Your intelligent math assistant. Enter an equation, integral,
+      or probability — and get the <strong>complete solution</strong> with every step clearly explained.
+    </p>
+
+    <div class="hero-actions">
+      <a href="index.html" class="btn-primary">
+        <span>🚀</span> <span data-i18n="btn_start">Get started</span>
+      </a>
+      <a href="#features" class="btn-secondary">
+        <span>✦</span> <span data-i18n="btn_how">See how it works</span>
+      </a>
+    </div>
+ 
+    <div class="hero-preview">
+      <div class="preview-window">
+        <div class="preview-topbar">
+          <div class="dot dot-r"></div>
+          <div class="dot dot-y"></div>
+          <div class="dot dot-g"></div>
+          <span style="color:var(--muted); font-size:0.8rem; margin-left:12px;">MathGenius — Chat</span>
+        </div>
+        <div class="preview-body">
+          <div class="chat-msg user">
+            <div class="avatar avatar-user">U</div>
+            <div class="bubble bubble-user">Solve: 2x + 4 = 10</div>
+          </div>
+          <div class="chat-msg">
+            <div class="avatar avatar-bot">M</div>
+            <div class="bubble bubble-bot">
+              <strong style="color:var(--text)">Solution for 2x + 4 = 10</strong>
+              <div class="step">
+                <span class="step-num">1</span>
+                <span>Subtract 4 from both sides: <span class="highlight">2x = 6</span></span>
+              </div>
+              <div class="step">
+                <span class="step-num">2</span>
+                <span>Divide by 2: <span class="highlight">x = 3</span></span>
+              </div>
+            </div>
+          </div>
+          <div class="chat-msg user">
+            <div class="avatar avatar-user">U</div>
+            <div class="bubble bubble-user">What about x² - 5x + 6 = 0?</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+ 
+  <!-- TICKER -->
+  <div class="ticker-section" id="examples">
+    <div class="ticker-track">
+      <div class="ticker-item">2x + 4 = 5 → <span>x = 0.5</span></div>
+      <div class="ticker-item">∫ x² dx → <span>x³/3 + C</span></div>
+      <div class="ticker-item">log₂(8) = <span>3</span></div>
+      <div class="ticker-item">Pythagorean: a²+b²=c² → <span>c = 5</span></div>
+      <div class="ticker-item">P(A∩B) = <span>P(A)·P(B)</span></div>
+      <div class="ticker-item">x² - 5x + 6 = 0 → <span>x=2, x=3</span></div>
+      <div class="ticker-item">d/dx(sin x) = <span>cos x</span></div>
+      <div class="ticker-item">3x - 7 = 2x + 1 → <span>x = 8</span></div>
+      <!-- duplicate for seamless loop -->
+      <div class="ticker-item">2x + 4 = 5 → <span>x = 0.5</span></div>
+      <div class="ticker-item">∫ x² dx → <span>x³/3 + C</span></div>
+      <div class="ticker-item">log₂(8) = <span>3</span></div>
+      <div class="ticker-item">Pythagorean: a²+b²=c² → <span>c = 5</span></div>
+      <div class="ticker-item">P(A∩B) = <span>P(A)·P(B)</span></div>
+      <div class="ticker-item">x² - 5x + 6 = 0 → <span>x=2, x=3</span></div>
+      <div class="ticker-item">d/dx(sin x) = <span>cos x</span></div>
+      <div class="ticker-item">3x - 7 = 2x + 1 → <span>x = 8</span></div>
+    </div>
+  </div>
+ 
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <div class="section-label" data-i18n="section_label">Features</div>
+    <h2 class="section-title" data-i18n="section_title">Everything you need</h2>
+
+    <div class="features-grid">
+      <div class="feature-card" style="--card-accent: #4f8eff">
+        <div class="feature-icon" style="background:rgba(79,142,255,0.12)">🧮</div>
+        <h3 data-i18n="feat1_title">Step-by-step solving</h3>
+        <p data-i18n="feat1_desc">Every solution is broken down into clear, numbered steps. You understand not just the answer, but the reasoning behind it.</p>
+      </div>
+
+      <div class="feature-card" style="--card-accent: #a78bfa">
+        <div class="feature-icon" style="background:rgba(167,139,250,0.12)">💬</div>
+        <h3 data-i18n="feat2_title">Conversation history</h3>
+        <p data-i18n="feat2_desc">All your history is saved. Come back to past problems, compare methods, or continue an interrupted session.</p>
+      </div>
+
+      <div class="feature-card" style="--card-accent: #34d399">
+        <div class="feature-icon" style="background:rgba(52,211,153,0.12)">∞</div>
+        <h3 data-i18n="feat3_title">All branches of math</h3>
+        <p data-i18n="feat3_desc">Algebra, calculus, probability, geometry, statistics, differential equations — MathGenius covers it all.</p>
+      </div>
+
+      <div class="feature-card" style="--card-accent: #f59e0b">
+        <div class="feature-icon" style="background:rgba(245,158,11,0.12)">⚡</div>
+        <h3 data-i18n="feat4_title">Instant answers</h3>
+        <p data-i18n="feat4_desc">No waiting. Solutions arrive in real time with clean formatting for optimal readability.</p>
+      </div>
+
+      <div class="feature-card" style="--card-accent: #ef4444">
+        <div class="feature-icon" style="background:rgba(239,68,68,0.12)">🎯</div>
+        <h3 data-i18n="feat5_title">Result verification</h3>
+        <p data-i18n="feat5_desc">Every solution is verified and the substitution is shown so you can confirm accuracy yourself.</p>
+      </div>
+
+      <div class="feature-card" style="--card-accent: #06b6d4">
+        <div class="feature-icon" style="background:rgba(6,182,212,0.12)">🗑️</div>
+        <h3 data-i18n="feat6_title">History management</h3>
+        <p data-i18n="feat6_desc">Clear a session or all history in one click. You stay in full control of your data.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="cta-card">
+      <h2 data-i18n="cta_title">Ready to solve anything?</h2>
+      <p data-i18n="cta_desc">Join thousands of students using MathGenius to master mathematics. Free, no sign-up required.</p>
+      <a href="index.html" class="btn-primary" style="font-size:1.05rem; padding: 18px 40px;">
+        🚀 <span data-i18n="cta_btn">Open the chatbot →</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="logo" style="font-size:1rem">
+      <div class="logo-icon" style="width:24px;height:24px;font-size:0.75rem">∑</div>
+      Math<span>Genius</span>
+    </div>
+    <span></span>
+    <span style="color:var(--muted)" data-i18n="footer_tagline">Solve · Understand · Progress</span>
+  </footer>
+ 
+<script>
+const TRANSLATIONS = {
+  en: {
+    nav_features: 'Features', nav_examples: 'Examples', nav_cta: 'Try it →',
+    badge: 'Powered by Gemini AI · Step-by-step explanations',
+    hero_line1: 'Solve', hero_line2: 'anything',
+    hero_sub: 'Your intelligent math assistant. Enter an equation, integral, or probability — and get the <strong>complete solution</strong> with every step clearly explained.',
+    btn_start: 'Get started', btn_how: 'See how it works',
+    section_label: 'Features', section_title: 'Everything you need',
+    feat1_title: 'Step-by-step solving',
+    feat1_desc: 'Every solution is broken down into clear, numbered steps. You understand not just the answer, but the reasoning behind it.',
+    feat2_title: 'Conversation history',
+    feat2_desc: 'All your history is saved. Come back to past problems, compare methods, or continue an interrupted session.',
+    feat3_title: 'All branches of math',
+    feat3_desc: 'Algebra, calculus, probability, geometry, statistics, differential equations — MathGenius covers it all.',
+    feat4_title: 'Instant answers',
+    feat4_desc: 'No waiting. Solutions arrive in real time with clean formatting for optimal readability.',
+    feat5_title: 'Result verification',
+    feat5_desc: 'Every solution is verified and the substitution is shown so you can confirm accuracy yourself.',
+    feat6_title: 'History management',
+    feat6_desc: 'Clear a session or all history in one click. You stay in full control of your data.',
+    cta_title: 'Ready to solve anything?',
+    cta_desc: 'Join thousands of students using MathGenius to master mathematics. Free, no sign-up required.',
+    cta_btn: 'Open the chatbot →',
+    footer_tagline: 'Solve · Understand · Progress',
+  },
+  fr: {
+    nav_features: 'Fonctionnalités', nav_examples: 'Exemples', nav_cta: 'Essayer →',
+    badge: 'Propulsé par Gemini AI · Explications étape par étape',
+    hero_line1: 'Résolvez', hero_line2: 'tout',
+    hero_sub: 'Votre assistant mathématique intelligent. Entrez une équation, une intégrale ou une probabilité — et obtenez la <strong>solution complète</strong> avec chaque étape clairement expliquée.',
+    btn_start: 'Commencer', btn_how: 'Voir comment ça marche',
+    section_label: 'Fonctionnalités', section_title: 'Tout ce dont vous avez besoin',
+    feat1_title: 'Résolution étape par étape',
+    feat1_desc: 'Chaque solution est décomposée en étapes claires et numérotées. Vous comprenez non seulement la réponse, mais aussi le raisonnement.',
+    feat2_title: 'Historique des conversations',
+    feat2_desc: 'Tout votre historique est sauvegardé. Revenez sur des problèmes passés, comparez les méthodes ou continuez une session interrompue.',
+    feat3_title: 'Toutes les branches des maths',
+    feat3_desc: 'Algèbre, calcul, probabilités, géométrie, statistiques, équations différentielles — MathGenius couvre tout.',
+    feat4_title: 'Réponses instantanées',
+    feat4_desc: 'Sans attente. Les solutions arrivent en temps réel avec une mise en forme claire pour une lisibilité optimale.',
+    feat5_title: 'Vérification des résultats',
+    feat5_desc: 'Chaque solution est vérifiée et la substitution est montrée pour que vous puissiez confirmer l\'exactitude vous-même.',
+    feat6_title: 'Gestion de l\'historique',
+    feat6_desc: 'Effacez une session ou tout l\'historique en un clic. Vous gardez le plein contrôle de vos données.',
+    cta_title: 'Prêt à tout résoudre ?',
+    cta_desc: 'Rejoignez des milliers d\'étudiants qui utilisent MathGenius pour maîtriser les mathématiques. Gratuit, sans inscription.',
+    cta_btn: 'Ouvrir le chatbot →',
+    footer_tagline: 'Résoudre · Comprendre · Progresser',
+  },
+  hi: {
+    nav_features: 'विशेषताएं', nav_examples: 'उदाहरण', nav_cta: 'आज़माएं →',
+    badge: 'Gemini AI द्वारा संचालित · चरण-दर-चरण समाधान',
+    hero_line1: 'हल करें', hero_line2: 'कुछ भी',
+    hero_sub: 'आपका बुद्धिमान गणित सहायक। कोई भी समीकरण, समाकल या संभाव्यता दर्ज करें — और पाएं <strong>पूर्ण समाधान</strong> हर चरण के साथ स्पष्ट रूप से समझाया गया।',
+    btn_start: 'शुरू करें', btn_how: 'देखें कैसे काम करता है',
+    section_label: 'विशेषताएं', section_title: 'आपको जो चाहिए वो सब',
+    feat1_title: 'चरण-दर-चरण समाधान',
+    feat1_desc: 'हर समाधान को स्पष्ट, क्रमांकित चरणों में तोड़ा जाता है। आप सिर्फ उत्तर नहीं, बल्कि उसके पीछे का तर्क भी समझते हैं।',
+    feat2_title: 'बातचीत का इतिहास',
+    feat2_desc: 'आपका सारा इतिहास सहेजा जाता है। पुरानी समस्याओं पर वापस आएं, विधियों की तुलना करें, या बाधित सत्र जारी रखें।',
+    feat3_title: 'गणित की सभी शाखाएं',
+    feat3_desc: 'बीजगणित, कलन, संभाव्यता, ज्यामिति, सांख्यिकी, अवकल समीकरण — MathGenius सब कवर करता है।',
+    feat4_title: 'तुरंत उत्तर',
+    feat4_desc: 'कोई प्रतीक्षा नहीं। समाधान वास्तविक समय में स्पष्ट फॉर्मेटिंग के साथ आते हैं।',
+    feat5_title: 'परिणाम सत्यापन',
+    feat5_desc: 'हर समाधान की जांच की जाती है और प्रतिस्थापन दिखाया जाता है ताकि आप स्वयं सटीकता की पुष्टि कर सकें।',
+    feat6_title: 'इतिहास प्रबंधन',
+    feat6_desc: 'एक क्लिक में सत्र या सारा इतिहास साफ करें। आपके डेटा पर पूर्ण नियंत्रण आपके पास रहता है।',
+    cta_title: 'कुछ भी हल करने के लिए तैयार?',
+    cta_desc: 'हजारों छात्रों के साथ जुड़ें जो MathGenius का उपयोग गणित में महारत हासिल करने के लिए करते हैं। मुफ्त, बिना साइन-अप के।',
+    cta_btn: 'चैटबॉट खोलें →',
+    footer_tagline: 'हल करें · समझें · आगे बढ़ें',
+  },
+  te: {
+    nav_features: 'లక్షణాలు', nav_examples: 'ఉదాహరణలు', nav_cta: 'ప్రయత్నించండి →',
+    badge: 'Gemini AI చే ఆధారితం · దశల వారీ వివరణలు',
+    hero_line1: 'పరిష్కరించండి', hero_line2: 'ఏదైనా',
+    hero_sub: 'మీ తెలివైన గణిత సహాయకుడు. సమీకరణం, సమాకలం లేదా సంభావ్యత నమోదు చేయండి — మరియు పొందండి <strong>పూర్తి పరిష్కారం</strong> ప్రతి దశ స్పష్టంగా వివరించబడింది.',
+    btn_start: 'ప్రారంభించండి', btn_how: 'ఎలా పని చేస్తుందో చూడండి',
+    section_label: 'లక్షణాలు', section_title: 'మీకు కావలసినదంతా',
+    feat1_title: 'దశల వారీ పరిష్కారం',
+    feat1_desc: 'ప్రతి పరిష్కారం స్పష్టమైన, సంఖ్యాంకిత దశలుగా విభజించబడింది. మీరు సమాధానం మాత్రమే కాదు, దాని వెనుక తర్కాన్ని కూడా అర్థం చేసుకుంటారు.',
+    feat2_title: 'సంభాషణ చరిత్ర',
+    feat2_desc: 'మీ చరిత్ర మొత్తం సేవ్ చేయబడింది. పాత సమస్యలకు తిరిగి వెళ్ళండి, పద్ధతులను పోల్చండి లేదా అంతరాయపడిన సెషన్ కొనసాగించండి.',
+    feat3_title: 'గణితంలోని అన్ని శాఖలు',
+    feat3_desc: 'బీజగణితం, కాలిక్యులస్, సంభావ్యత, జ్యామితి, గణాంకాలు, అవకలన సమీకరణాలు — MathGenius అన్నింటినీ కవర్ చేస్తుంది.',
+    feat4_title: 'తక్షణ సమాధానాలు',
+    feat4_desc: 'వేచి ఉండకుండా. పరిష్కారాలు నిజ సమయంలో స్పష్టమైన ఆకృతీకరణతో వస్తాయి.',
+    feat5_title: 'ఫలితం ధృవీకరణ',
+    feat5_desc: 'ప్రతి పరిష్కారం ధృవీకరించబడుతుంది మరియు ప్రత్యామ్నాయం చూపబడుతుంది, తద్వారా మీరు స్వయంగా ధృవీకరించవచ్చు.',
+    feat6_title: 'చరిత్ర నిర్వహణ',
+    feat6_desc: 'ఒక క్లిక్‌లో సెషన్ లేదా మొత్తం చరిత్రను క్లియర్ చేయండి. మీ డేటాపై మీకు పూర్తి నియంత్రణ ఉంటుంది.',
+    cta_title: 'ఏదైనా పరిష్కరించడానికి సిద్ధంగా ఉన్నారా?',
+    cta_desc: 'గణితాన్ని నేర్చుకోవడానికి MathGenius ఉపయోగించే వేల మంది విద్యార్థులతో చేరండి. ఉచితం, నమోదు అవసరం లేదు.',
+    cta_btn: 'చాట్‌బాట్ తెరవండి →',
+    footer_tagline: 'పరిష్కరించండి · అర్థం చేసుకోండి · పురోగమించండి',
+  }
+};
+
+function applyLang(lang) {
+  const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    el.textContent = t[el.dataset.i18n] ?? el.textContent;
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    el.innerHTML = t[el.dataset.i18nHtml] ?? el.innerHTML;
+  });
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
+  });
+  localStorage.setItem('mathmind_lang', lang);
+  document.documentElement.lang = lang;
+}
+
+document.querySelectorAll('.lang-btn').forEach(btn => {
+  btn.addEventListener('click', () => applyLang(btn.dataset.lang));
+});
+
+applyLang(localStorage.getItem('mathmind_lang') || 'en');
+</script>
+</body>
+</html>
