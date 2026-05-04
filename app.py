@@ -9,9 +9,7 @@ from functools import wraps
 from dotenv import load_dotenv
 from pathlib import Path
 
-# ──────────────────────────────────────────────
-# Configuration
-# ──────────────────────────────────────────────
+
 load_dotenv(Path(__file__).parent / '.env')
 
 logging.basicConfig(
@@ -23,9 +21,6 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 CORS(app, origins=os.getenv('ALLOWED_ORIGINS', '*').split(','))
 
-# ──────────────────────────────────────────────
-# Constantes
-# ──────────────────────────────────────────────
 MAX_HISTORY = 10
 MAX_MESSAGE_LENGTH = 2000
 
@@ -36,18 +31,14 @@ LANG_INSTRUCTIONS = {
     'te': 'దశల వివరణలు తెలుగులో ఉండాలి, స్పష్టంగా మరియు విద్యాపరంగా.',
 }
 
-# ──────────────────────────────────────────────
-# Initialisation Gemini
-# ──────────────────────────────────────────────
+
 GOOGLE_API_KEY = os.getenv('GIzaSyCw31kzv-jzKP5nHxOeYfJR2PtuEOPOGE0')
 if not GOOGLE_API_KEY:
     raise RuntimeError("GOOGLE_API_KEY manquante dans le fichier .env")
 
 genai.configure(api_key=GOOGLE_API_KEY)
 
-# ──────────────────────────────────────────────
-# Helpers
-# ──────────────────────────────────────────────
+
 def get_system_prompt(language: str = 'en') -> str:
     lang_instr = LANG_INSTRUCTIONS.get(language, LANG_INSTRUCTIONS['en'])
     return f"""You are MathMind, an expert math assistant.
